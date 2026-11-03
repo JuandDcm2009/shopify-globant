@@ -4,6 +4,25 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 
+function QuantityInput({ onQuantityChange }) {
+    const [quantity, setQuantity] = useState(0);
+
+    const handleChange = (e) => {
+        const val = Number(e.target.value);
+        setQuantity(val);
+        onQuantityChange(val);
+    } 
+
+    return(
+        <input 
+            type="numeric"
+            placeholder='quantity'
+            value={quantity}
+            onChange={handleChange}
+        />
+    );
+}
+
 function App() {
   const products = [
     { id: 1, name: "Wireless Mouse", price: 25.00 },
@@ -14,18 +33,23 @@ function App() {
 
   const [productsCart, setProductsCart] = useState(products);
 
-  const handleUpdateSubtotal = (event) => {
-    console.log(event);
-    const element = event.target;
-    element.value
+  const handleUpdateSubtotal = (id, quantity) => {
+    const updatedCart = [...productsCart];
+    const productIndex = productsCart.findIndex(product => product.id === id);
+    const product = updatedCart[productIndex]
+
+    const updatedProduct = {...product, subtotal: product.price * quantity}
+    updatedCart[productIndex] = updatedProduct;
+
+    setProductsCart(updatedCart)
   }
 
   return (
     <>
-      {products.map(product => 
+      {productsCart.map(product => 
         <>
-          <h1 key={product.id}>{product.name}: ${product.price} - Subtotal: {}</h1>
-          <input type="numeric" placeholder='quantity' defaultValue={0} onChange={handleUpdateSubtotal}/>
+          <h1 key={product.id}>{product.name}: ${product.price} - Subtotal: {product.subtotal}</h1>
+          <QuantityInput onQuantityChange={(quantity) => handleUpdateSubtotal(product.id, quantity)}/>
         </>
         
       )}    
